@@ -3,21 +3,20 @@
 file=$1
 dirToWrite=$2
 
-if ! test -d $file ; then
-	echo "File ${file} doesn't exist";
-	exit 1
+if [ ! -d "$file" ]; then
+    echo "Directory ${file} doesn't exist"
+    exit 1
 fi
 
-if ! test -d $dirToWrite ; then
-        echo "File ${dirToWrite} doesn't exist";
-        exit 1
-fi    
+if [ ! -d "$dirToWrite" ]; then
+    echo "Directory ${dirToWrite} doesn't exist"
+    exit 1
+fi
 
-find $file -maxdepth 1 ! -name $file -type d -exec basename {} \; | while read saved;
-	do
-		filename=$2/$saved.txt;
-		touch $filename;
-		echo $(ls $1/$saved | wc -l) > $filename;
-		echo $(ls $1/$saved | wc -l);
-	done
+find "$file" -maxdepth 1 -mindepth 1 -type d | while read -r saved; do
+    filename="${dirToWrite}/$(basename "$saved").txt"
+    touch "$filename"
+    echo "$(ls "$saved" | wc -l)" > "$filename"
+    echo "$(ls "$saved" | wc -l)"
+done
 

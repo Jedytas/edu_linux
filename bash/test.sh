@@ -10,7 +10,7 @@ fi
 for subdir in "$directory"
 do
     if [ -d "$subdir" ];
-  then
+	then
         subdir_name=$(basename "$subdir")
         count=$(find "$subdir" -mindepth 1 -maxdepth 1 | wc -l)
         echo "$count" > "$directory/$subdir_name.txt"

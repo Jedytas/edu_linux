@@ -30,6 +30,7 @@ jobs:
     - name: Run tests
       working-directory: ./docker
       run: |
+        export PYTHONPATH=$PYTHONPATH:$(pwd)/docker
         pytest tests
 
     - name: Deploy to server via SSH
@@ -44,4 +45,3 @@ jobs:
           docker stop kubsu-app || true
           docker rm kubsu-app || true
           docker run -d --name kubsu-app -p 8105:8105 stallman141/kubsu-app:latest
-

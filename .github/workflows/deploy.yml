@@ -1,0 +1,47 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Change to docker directory
+      working-directory: ./docker
+      run: |
+        echo "Moved into docker/ directory"
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    - name: Install dependencies
+      working-directory: ./docker
+      run: |
+        pip install ".[test]"
+
+    - name: Run tests
+      working-directory: ./docker
+      run: |
+        export PYTHONPATH=$PYTHONPATH:$(pwd)/docker
+        pytest tests
+
+    - name: Deploy to server via SSH
+      uses: appleboy/ssh-action@v0.1.7
+      with:
+        host: ${{ secrets.SERVER_HOST }}
+        username: ${{ secrets.SERVER_USER }}
+        key: ${{ secrets.SERVER_SSH_KEY }}
+        port: ${{ secrets.SERVER_PORT }}
+        script: |
+          docker pull stallman141/kubsu-app:latest
+          docker stop kubsu-app || true
+          docker rm kubsu-app || true
+          docker run -d --name kubsu-app -p 8105:8105 stallman141/kubsu-app:latest

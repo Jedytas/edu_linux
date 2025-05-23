@@ -80,7 +80,7 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no \
             ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} \
-            -p ${{ secrets.SERVER_SSH_KEY }} \
+            -p ${{ secrets.SERVER_PORT }} \
             "podman pull ${{ secrets.DOCKERHUB_USERNAME }}/kubsu-cicd:latest \
              && podman stop $CONTAINER_NAME || true \
              && podman rm $CONTAINER_NAME || true \

@@ -88,4 +88,4 @@ jobs:
                 --network host \
                 --name $CONTAINER_NAME \
                 -e DATABASE_URL='${{ secrets.DATABASE_URL }}' \
-                ${{ secrets.DOCKERHUB_USERNAME }}/kubsu-cicd:latest"
+                ${{ secrets.DOCKERHUB_USERNAME }}/kubsu-cicd:latest" 

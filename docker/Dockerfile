@@ -11,5 +11,5 @@ WORKDIR /app
 RUN apk add --no-cache make
 COPY . .
 COPY --from=builder /install /usr/local
-EXPOSE 8058
+EXPOSE 8105
 CMD ["make", "run"]

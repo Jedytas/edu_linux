@@ -1,15 +1,11 @@
 FROM python:3.10-alpine AS builder
 WORKDIR /build
-RUN apk add --no-cache make
-COPY ./Makefile ./Makefile
 COPY ./pyproject.toml ./pyproject.toml
-RUN make install && make install-dev
-
+RUN pip install --prefix=/install . && pip install --prefix=/install ".[test]"
 
 FROM python:3.10-alpine AS runtime
 WORKDIR /app
-RUN apk add --no-cache make
 COPY . .
 COPY --from=builder /install /usr/local
 EXPOSE 8105
-CMD ["make", "run"]
+CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8105", "--reload"]

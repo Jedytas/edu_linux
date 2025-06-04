@@ -61,7 +61,7 @@ jobs:
             --network host \
             -e DATABASE_URL=${{ secrets.DATABASE_URL }} \
             ${{ secrets.DOCKERHUB_USERNAME }}/kubsu-cicd:latest \
-            sh -c "while ! nc -z localhost 5432; do sleep 1; done && make test"
+            sh -c "while ! nc -z localhost 5432; do sleep 1; done && pytest tests"
 
       - name: Cleanup
         run: |
@@ -90,3 +90,9 @@ jobs:
             --name $CONTAINER_NAME \
             -e DATABASE_URL="${{ secrets.DATABASE_URL }}" \
             ${{ secrets.DOCKERHUB_USERNAME }}/kubsu-cicd:latest
+
+      - name: Show hostname
+        run: hostname
+
+      - name: List running containers
+        run: podman ps -a

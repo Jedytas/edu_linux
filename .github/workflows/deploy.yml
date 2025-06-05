@@ -71,28 +71,19 @@ jobs:
   deploy:
     name: Deploy to production (self-hosted)
     runs-on: self-hosted
-    env:
-      CONTAINER_NAME: app
     needs: [ test ]
     steps:
-      - name: Pull docker image
-        run: podman pull ${{ secrets.DOCKERHUB_USERNAME }}/kubsu-cicd:latest
-
-      - name: Stop old container
-        run: |
-          podman stop $CONTAINER_NAME || true
-          podman rm $CONTAINER_NAME || true
-
-      - name: Run new container
-        run: | 
-          podman run -d \
-            --network host \
-            --name $CONTAINER_NAME \
-            -e DATABASE_URL="${{ secrets.DATABASE_URL }}" \
-            ${{ secrets.DOCKERHUB_USERNAME }}/kubsu-cicd:latest
-
-      - name: Show hostname
-        run: hostname
-
-      - name: List running containers
-        run: podman ps -a
+      - name: SSH, deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          port: ${{ secrets.DEPLOY_PORT }}
+          script: |
+            podman pull ${{ secrets.DOCKERHUB_USERNAME }}/kubsu-cicd:latest
+            podman stop app || true
+            podman rm -f app || true
+            podman run -d --net=host --replace --name app -p 8105:8105 -e DATABASE_URL='${{ secrets.DATABASE_URL }}' ${{ secrets.DOCKERHUB_USERNAME }}/kubsu-cicd:latest
+            hostname
+            podman ps -a
